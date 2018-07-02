@@ -23,7 +23,7 @@
         public DateTimeOffset MessageTimeStamp { get; set; }
     }
 
-    public class BetRegisteredCommandHandler : RequestHandler<BetRegistrationCommand>
+    public class BetRegistrationCommandHandler : RequestHandler<BetRegistrationCommand>
     {
         public override BetRegistrationCommand Handle(BetRegistrationCommand @event)
         {

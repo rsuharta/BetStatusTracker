@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Paramore.Brighter;
 using Paramore.Brighter.CommandStore.MsSql;
 
@@ -12,7 +13,7 @@ namespace BetStatusTracker
             var serviceProvider = BuildServiceProvider();
 
             var registry = new SubscriberRegistry();
-            registry.Register<BetRegistrationCommand, BetRegisteredCommandHandler>();
+            registry.Register<BetRegistrationCommand, BetRegistrationCommandHandler>();
 
             var builder = CommandProcessorBuilder.With()
                 .Handlers(new HandlerConfiguration(
@@ -23,9 +24,6 @@ namespace BetStatusTracker
                 .NoTaskQueues()
                 .RequestContextFactory(new InMemoryRequestContextFactory());
 
-            var commandStore =
-                new MsSqlCommandStore(new MsSqlCommandStoreConfiguration("", "Command"));
-
             var commandProcessor = builder.Build();
             commandProcessor.Send(new BetRegistrationCommand());
 
@@ -35,7 +33,14 @@ namespace BetStatusTracker
         private static IServiceProvider BuildServiceProvider()
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddScoped<BetRegisteredHandler>();
+            serviceCollection.AddScoped<BetRegistrationCommandHandler>();
+
+            var commandStore =
+                new MsSqlCommandStore(new MsSqlCommandStoreConfiguration("", "Command"));
+
+            serviceCollection.Add(new ServiceDescriptor(typeof(IAmACommandStore), p => commandStore, ServiceLifetime.Singleton));
+            serviceCollection.Add(new ServiceDescriptor(typeof(IAmACommandStoreAsync), p => commandStore, ServiceLifetime.Singleton));
+            
             return serviceCollection.BuildServiceProvider();
         }
     }
