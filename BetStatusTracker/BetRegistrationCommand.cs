@@ -3,32 +3,22 @@
     using System;
     using Paramore.Brighter;
 
-    public class BetRegistrationCommand : ICommand
+    public class BetRegistrationCommand : Command
     {
-        /// <summary>
-        /// Correlation Id.
-        /// </summary>
-        public Guid Id { get; set; }
-        
+        public BetRegistrationCommand() : base(Guid.NewGuid())
+        {
+        }
+
         public string BetClientRef { get; set; }
 
         public string SequenceNo { get; set; }
 
         public DateTimeOffset BetSubmittedTime { get; set; }
-        
+
         public string CustomerId { get; set; }
 
         public decimal StakeAmount { get; set; }
 
         public DateTimeOffset MessageTimeStamp { get; set; }
-    }
-
-    public class BetRegistrationCommandHandler : RequestHandler<BetRegistrationCommand>
-    {
-        public override BetRegistrationCommand Handle(BetRegistrationCommand @event)
-        {
-            Console.WriteLine($"{@event.Id}");
-            return base.Handle(@event);
-        }
     }
 }

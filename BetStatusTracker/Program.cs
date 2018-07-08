@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Paramore.Brighter;
 using Paramore.Brighter.CommandStore.MsSql;
+using Paramore.Brighter.Eventsourcing.Handlers;
 
 namespace BetStatusTracker
 {
@@ -10,7 +11,10 @@ namespace BetStatusTracker
     {
         static void Main(string[] args)
         {
-            var serviceProvider = BuildServiceProvider();
+            var commandStore =
+                new MsSqlCommandStore(new MsSqlCommandStoreConfiguration("Server=localhost;Database=BetStatusTracker;Trusted_Connection=True;", "Command"));
+
+            var serviceProvider = BuildServiceProvider(commandStore);
 
             var registry = new SubscriberRegistry();
             registry.Register<BetRegistrationCommand, BetRegistrationCommandHandler>();
@@ -23,24 +27,26 @@ namespace BetStatusTracker
                 .DefaultPolicy()
                 .NoTaskQueues()
                 .RequestContextFactory(new InMemoryRequestContextFactory());
-
+            
             var commandProcessor = builder.Build();
-            commandProcessor.Send(new BetRegistrationCommand());
+            var command = new BetRegistrationCommand();
+            commandProcessor.Send(command);
+
+            var retrievedCommand = commandStore.Get<BetRegistrationCommand>(command.Id);
+
+            Console.WriteLine($"Retrieved command Id: {retrievedCommand.Id}");
 
             Console.ReadLine();
         }
 
-        private static IServiceProvider BuildServiceProvider()
+        private static IServiceProvider BuildServiceProvider(IAmACommandStore commandStore)
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddScoped<BetRegistrationCommandHandler>();
-
-            var commandStore =
-                new MsSqlCommandStore(new MsSqlCommandStoreConfiguration("", "Command"));
-
-            serviceCollection.Add(new ServiceDescriptor(typeof(IAmACommandStore), p => commandStore, ServiceLifetime.Singleton));
-            serviceCollection.Add(new ServiceDescriptor(typeof(IAmACommandStoreAsync), p => commandStore, ServiceLifetime.Singleton));
             
+            var commandSourcingHandler = new CommandSourcingHandler<BetRegistrationCommand>(commandStore);
+            serviceCollection.Add(new ServiceDescriptor(typeof(CommandSourcingHandler<BetRegistrationCommand>), p => commandSourcingHandler, ServiceLifetime.Transient));
+
             return serviceCollection.BuildServiceProvider();
         }
     }
