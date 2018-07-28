@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetStatusTracker", "BetStatusTracker\BetStatusTracker.csproj", "{EF5D1745-D85C-49A5-9702-D7A46F3C0730}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetStatusTracker", "src\BetStatusTracker\BetStatusTracker.csproj", "{EF5D1745-D85C-49A5-9702-D7A46F3C0730}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetStatusTracker.Repositories", "BetStatusTracker.Repositories\BetStatusTracker.Repositories.csproj", "{D07949D6-5C3D-40B2-B2CA-BAF5AAE28DA5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetStatusTracker.Repositories", "src\BetStatusTracker.Repositories\BetStatusTracker.Repositories.csproj", "{D07949D6-5C3D-40B2-B2CA-BAF5AAE28DA5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetStatusTracker.WebApi", "BetStatusTracker.WebApi\BetStatusTracker.WebApi.csproj", "{D0B96517-CCB1-4F49-AA79-11ACCD013646}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BetStatusTracker.WebApi", "src\BetStatusTracker.WebApi\BetStatusTracker.WebApi.csproj", "{D0B96517-CCB1-4F49-AA79-11ACCD013646}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
