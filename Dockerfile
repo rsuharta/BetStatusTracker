@@ -1,5 +1,5 @@
 # Build image
-FROM microsoft/aspnetcore-build:2.1 AS builder
+FROM microsoft/dotnet:2.1-sdk AS builder
 ENV MONO_VERSION 5.4.1.6
 
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
@@ -15,23 +15,28 @@ RUN apt-get update \
 
 WORKDIR /sln
 
-COPY ./build.sh ./build.cake ./
+COPY ./build/build.sh ./build/build.cake ./
 
-RUN ./build.sh -Target=Clean  
+# Install Cake, and compile the Cake build script
+RUN ./build.sh -t Clean
 
 COPY ./BetStatusTracker.sln ./  
 COPY ./src/BetStatusTracker/BetStatusTracker.csproj  ./src/BetStatusTracker/BetStatusTracker.csproj  
 COPY ./src/BetStatusTracker.Repositories/BetStatusTracker.Repositories.csproj  ./src/BetStatusTracker.Repositories/BetStatusTracker.Repositories.csproj  
-RUN ./build.sh -Target=Restore  
+COPY ./src/BetStatusTracker.WebApi/BetStatusTracker.WebApi.csproj  ./src/BetStatusTracker.WebApi/BetStatusTracker.WebApi.csproj  
+RUN ./build.sh -t Restore
+RUN ./build.sh -t BuildWindowService
+
+COPY ./src ./src
 
 ARG PackageVersion
 ENV PackageVersion=$PackageVersion
 
 # Publish web app
-Run ./build.sh -Target=PublishWindowService
+RUN ./build.sh -t PackageWindowService
 
 #App image
-FROM microsoft/aspnetcore:2.1
+FROM microsoft/dotnet:2.1-runtime
 WORKDIR /app
 ENV ASPNETCORE_ENVIRONMENT Production
 ENTRYPOINT ["dotnet", "BetStatusTracker.dll"]

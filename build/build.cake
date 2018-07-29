@@ -18,7 +18,8 @@ Task("Clean")
 Task("Restore")  
     .Does(() =>
     {
-        DotNetCoreRestore("../");
+        //DotNetCoreRestore("../");
+        DotNetCoreRestore("");
     });
 
 // Build using the build configuration specified as an argument.
@@ -26,6 +27,17 @@ Task("Restore")
     .Does(() =>
     {
         DotNetCoreBuild("../",
+            new DotNetCoreBuildSettings()
+            {
+                Configuration = configuration,
+                ArgumentCustomization = args => args.Append("--no-restore"),
+            });
+    });
+
+Task("BuildWindowService")
+    .Does(() =>
+    {
+        DotNetCoreBuild("./src/BetStatusTracker/BetStatusTracker.csproj",
             new DotNetCoreBuildSettings()
             {
                 Configuration = configuration,
@@ -68,7 +80,7 @@ Task("PackageWindowService")
     .Does(() =>
     {
         DotNetCorePublish(
-            "../src/BetStatusTracker",
+            "./src/BetStatusTracker",
             new DotNetCorePublishSettings()
             {
                 Configuration = configuration,
@@ -76,7 +88,7 @@ Task("PackageWindowService")
                 ArgumentCustomization = args => args.Append("--no-restore"),
             });
 
-        Zip ("publish", $"{distDirectory}/BetStatusTracker.{version}.zip");
+        Zip ("dist", $"{distDirectory}/BetStatusTracker.{version}.zip");
     });
 
 // A meta-task that runs all the steps to Build and Test the app
