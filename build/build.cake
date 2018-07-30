@@ -18,8 +18,7 @@ Task("Clean")
 Task("Restore")  
     .Does(() =>
     {
-        //DotNetCoreRestore("../");
-        DotNetCoreRestore("");
+        DotNetCoreRestore("../");
     });
 
 // Build using the build configuration specified as an argument.
@@ -37,7 +36,8 @@ Task("Restore")
 Task("BuildWindowService")
     .Does(() =>
     {
-        DotNetCoreBuild("./src/BetStatusTracker/BetStatusTracker.csproj",
+        //DotNetCoreBuild("./src/BetStatusTracker/BetStatusTracker.csproj",
+        DotNetCoreBuild("../BetStatusTracker.sln",
             new DotNetCoreBuildSettings()
             {
                 Configuration = configuration,
@@ -80,7 +80,7 @@ Task("PackageWindowService")
     .Does(() =>
     {
         DotNetCorePublish(
-            "./src/BetStatusTracker",
+            "../",
             new DotNetCorePublishSettings()
             {
                 Configuration = configuration,

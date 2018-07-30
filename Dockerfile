@@ -15,19 +15,20 @@ RUN apt-get update \
 
 WORKDIR /sln
 
-COPY ./build/build.sh ./build/build.cake ./
-
-# Install Cake, and compile the Cake build script
-RUN ./build.sh -t Clean
+COPY ./build/build.sh ./build/build.cake ./build/
 
 COPY ./BetStatusTracker.sln ./  
 COPY ./src/BetStatusTracker/BetStatusTracker.csproj  ./src/BetStatusTracker/BetStatusTracker.csproj  
 COPY ./src/BetStatusTracker.Repositories/BetStatusTracker.Repositories.csproj  ./src/BetStatusTracker.Repositories/BetStatusTracker.Repositories.csproj  
 COPY ./src/BetStatusTracker.WebApi/BetStatusTracker.WebApi.csproj  ./src/BetStatusTracker.WebApi/BetStatusTracker.WebApi.csproj  
+COPY ./src ./src
+
+WORKDIR /sln/build
+
+# Install Cake, and compile the Cake build script
+RUN ./build.sh -t Clean
 RUN ./build.sh -t Restore
 RUN ./build.sh -t BuildWindowService
-
-COPY ./src ./src
 
 ARG PackageVersion
 ENV PackageVersion=$PackageVersion
@@ -40,4 +41,4 @@ FROM microsoft/dotnet:2.1-runtime
 WORKDIR /app
 ENV ASPNETCORE_ENVIRONMENT Production
 ENTRYPOINT ["dotnet", "BetStatusTracker.dll"]
-COPY --from=builder ./sln/dist .
+COPY --from=builder ./sln/build/dist .
